@@ -9,13 +9,10 @@ except pkg_resources.DistributionNotFound:
 
 def console_entry():
     """If come from console entry point"""
-    #main()
+#main()
 
-# !! The main function are only here for debug. The real compiler don't need this`!!
+
+# !! The main function are only here for debug.`!!
 if __name__ == '__main__':
     unittest.main()
-
-
-
-
 

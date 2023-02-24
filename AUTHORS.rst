@@ -5,9 +5,9 @@ Credits
 Development Lead
 ----------------
 
-* Dinesha Ranathunga <mgtkhelp@gmail.com>
+* Eric Parsonage <eric@eparsonage.com>
 
 Contributors
 ------------
-
+* Dinesha Ranathunga <mgtkhelp@gmail.com>
 

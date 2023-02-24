@@ -4,6 +4,7 @@ def enum(*sequential, **named):
     enums['reverse_mapping'] = reverse
     return type('Enum', (), enums)
 
+
 GraphAttribute = enum(Type='type', Service='service', Exploits='exploits',
                       Label='label', SubnetIpAddress='subnetip',
                       SubnetMask='mask', IpAddress='ipaddress', VlanId='vlanid',

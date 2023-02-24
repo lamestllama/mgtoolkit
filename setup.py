@@ -5,6 +5,7 @@ Note that "python setup.py test" invokes pytest on the package. With appropriate
 configured setup.cfg, this will check both xxx_test modules and docstrings.
 
 Copyright 2017, dinesha ranathunga.
+Copyright 2023, Eric Parsonage.
 Licensed under MIT.
 """
 # -*- coding: utf-8 -*-
@@ -13,8 +14,8 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as test_command
 
-if sys.version_info[:2] != (2, 7):
-    print("mgtoolkit requires Python 2.7 (%d.%d detected)." %
+if sys.version_info[:3] != (3, 11):
+    print("mgtoolkit requires Python 3.11 (%d.%d detected)." %
           sys.version_info[:2])
     sys.exit(-1)
 
@@ -48,12 +49,12 @@ requirements = [
 # noinspection PyPep8
 setup(
     name='mgtoolkit',
-    version='1.0.7',
+    version='1.0.8',
     description="This is a Python package for implementing metagraphss.",
     long_description=readme + '\n\n' + history,
-    author="Dinesha Ranathunga",
-    author_email='mgtkhelp@gmail.com',
-    url='https://github.com/dinesharanathunga/mgtoolkit',
+    author="Eric Parsonage",
+    author_email='eric@eparsonage.com',
+    url='https://github.com/lamestllama/mgtoolkit',
     packages=[
         'mgtoolkit',
     ],
@@ -71,7 +72,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: System :: Networking',
         'Topic :: Scientific/Engineering :: Mathematics',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.11',
         'Natural Language :: English'
     ],
 

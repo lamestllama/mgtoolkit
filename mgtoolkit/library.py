@@ -75,6 +75,13 @@ class Triple(object):
                 len(self.edges) == len(other.edges) and
                 self.edges == other.edges)
 
+#TODO need to stop using sets in this way.
+    def __hash__(self):
+        s = str(None) if self.coinputs is None else str(sorted(self.coinputs, key=lambda x: str(x)))
+        s+= str(None) if self.cooutputs is None else str(sorted(self.cooutputs, key=lambda x: str(x)))
+        s+= str(self.edges)
+        return hash(s)
+
 
 class Node(object):
     """ Represents a metagraph node.
@@ -155,6 +162,14 @@ class Edge(object):
         return (self.invertex == other.invertex and
                 self.outvertex == other.outvertex and
                 self.attributes == other.attributes)
+
+    
+    #TODO need to stop using sets in this way. Perhaps frozensets?
+    def __hash__(self):
+        s = str(self.label)
+        s += str(sorted(self.invertex, key=lambda x: str(x)))
+        s+= str(sorted(self.outvertex, key=lambda x: str(x)))
+        return hash(s)
 
 
 class Metapath(object):
@@ -324,7 +339,7 @@ class Metagraph(object):
         if not MetagraphHelper().is_node_in_list(node2, self.nodes):
             self.nodes.append(node2)
 
-        #..then edges
+        # then edges
         if not MetagraphHelper().is_edge_in_list(edge, self.edges):
             self.edges.append(edge)
 
@@ -476,7 +491,7 @@ class Metagraph(object):
 
         # return adj_matrix
         # noinspection PyCallingNonCallable
-        return matrix(adj_matrix)
+        return matrix(adj_matrix, dtype=object)
 
     def adjacency_matrix(self):
         """ Returns the adjacency matrix of the metagraph.
@@ -487,7 +502,6 @@ class Metagraph(object):
         adj_matrix = MetagraphHelper().get_null_matrix(size, size)
 
         # create lookup table
-        count=1
         triples_lookup=dict()
         for edge in self.edges:
              for elt1 in edge.invertex:
@@ -498,9 +512,8 @@ class Metagraph(object):
                       if (elt1,elt2) not in triples_lookup:
                          triples_lookup[(elt1,elt2)] = []
                       triples_lookup[(elt1,elt2)].append(triple)
-                      count+=1
 
-        count=1
+
         gen_elts = list(self.generating_set)
         for i in range(size):
              for j in range(size):
@@ -508,11 +521,11 @@ class Metagraph(object):
                   x_j = gen_elts[j]
                   try:
                       adj_matrix[i][j] = triples_lookup[(x_i,x_j)]
-                  except BaseException,e:
+                  except BaseException as e:
                       pass
 
         # noinspection PyCallingNonCallable
-        return matrix(adj_matrix)
+        return matrix(adj_matrix, dtype=object)
 
     def equivalent(self, metagraph2):
         """Checks if current metagraph is equivalent to the metagraph provided.
@@ -632,7 +645,7 @@ class Metagraph(object):
                 break
 
         # noinspection PyCallingNonCallable
-        return matrix(a_star)
+        return matrix(a_star, dtype=object)
 
     def get_all_metapaths_from(self, source, target):
         """ Retrieves all metapaths between given source and target in the metagraph.
@@ -1213,7 +1226,7 @@ class Metagraph(object):
             index += 1
 
         post_merge_triples = dict()
-        for index, triples_list in triples_to_merge.iteritems():
+        for index, triples_list in triples_to_merge.items() :
             triple1 = triples_to_merge[index]
             if triple1 in triples_list_l0:
                 triples_list_l0.remove(triple1)
@@ -1243,8 +1256,8 @@ class Metagraph(object):
 
         triple_list_l0_copy = copy.copy(triples_list_l0)
 
-        post_merge_triples = dict()
-        for index, triples_list in triples_to_merge.iteritems():
+        post_merge_triples = dict() 
+        for index, triples_list in  triples_to_merge.items() :
             triple1 = triple_list_l0_copy[index]
             if triple1 in triples_list_l0:
                 triples_list_l0.remove(triple1)
@@ -2402,9 +2415,16 @@ class MetagraphHelper:
                 if temp is not None:
                     triples_list.append(temp)
 
+        #TODO why the conversion from list to set to list
+        # can only be to remove duplicates?
+        #NOTE added hash to allow this to stay for the moment
         if len(triples_list)>0:
-            return list(set(triples_list))
-
+            try :
+                tt = list(set(triples_list))
+            except BaseException as e:
+                    print('My personal error: Error- %s'%e)
+                    pass
+            return tt
         return []
 
     @staticmethod
@@ -3022,7 +3042,7 @@ class MetagraphHelper:
             dot_file.write(dot_file_text)
             dot_file.close()
 
-        except BaseException, e:
+        except BaseException as e:
             print('generate_visualisation:: Error- %s'%e)
 
 
