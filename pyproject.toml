@@ -1,6 +1,6 @@
 [project]
 name = "mgtoolkit"
-version = "1.0.8"
+version = "1.3.0"
 authors = [{ name="Eric Parsonage", email="eric@eparsonage.com" },
            { name="Dinesha Ranathunga", email="mgtkhelp@gmail.com" }
 ]
