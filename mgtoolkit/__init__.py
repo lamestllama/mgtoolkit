@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
-__author__ = """Dinesha Ranathunga"""
-__email__ = 'mgtkhelp@gmail.com'
-__version__ = '1.0.1'
+__author__ = """Eric Parsonage"""
+__email__ = 'eric@eparsonage.com'
+__version__ = '1.0.8'

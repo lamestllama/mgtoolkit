@@ -16,4 +16,3 @@ GraphAttribute = enum(Type='type', Service='service', Exploits='exploits',
 Ipv4ProtocolNumbers = enum(all=(0, 255), icmp=1, tcp=6, udp=17, eigrp=88, ospf=89)
 
 RuleEffect = enum(Permit=1, Deny=2)
-

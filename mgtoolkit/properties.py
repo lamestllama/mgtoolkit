@@ -10,4 +10,3 @@ resources = {'value_null': "value cannot be null or empty",
              'arguments_invalid': 'provided arguments are invalid',
              'structures_incompatible': 'structures are not compatible',
              'value_out_of_bounds': 'value is out of bounds'}
-

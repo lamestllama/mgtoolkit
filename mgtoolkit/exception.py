@@ -22,8 +22,3 @@ class MetagraphException(ApplicationException):
 # TODO: move this to the policy API
 class PolicyException(ApplicationException):
     """ Exception occurres in policy processing """
-
-
-
-
-
