@@ -23,3 +23,7 @@ classifiers=[
 "Homepage" = "https://github.com/pypa/sampleproject"
 "Bug Tracker" = "https://github.com/lamestllama/mgtoolkit/issues"
 
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
