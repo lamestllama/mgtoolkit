@@ -1,8 +1,7 @@
-from properties import resources
-from exception import MetagraphException
+from .properties import resources
+from .exception import MetagraphException
 from numpy import matrix
 import copy
-# import math
 
 
 def singleton(cls):
@@ -1333,9 +1332,6 @@ class Metagraph(object):
         # noinspection PyCallingNonCallable
         return matrix(incidence_matrix)
 
-    def occurrences(s, lst):
-        return (y for y, e in enumerate(lst) if e == s)
-
     def get_inverse(self):
         """ Gets the inverse metagraph.
         :return: Metagraph object
@@ -1420,9 +1416,11 @@ class Metagraph(object):
         # add links to alpha and beta
         row_index = 0
 
+        occurrences = lambda s, lst: (y for y, e in enumerate(lst) if e == s)
+
         for row in incidence_m:
             if row.__contains__(-1) and (not row.__contains__(1)):
-                col_indices = list(self.occurrences(-1, row))
+                col_indices = list(occurrences(-1, row))
                 for col_index in col_indices:
                     label = '<%s, alpha>' % (list(self.generating_set)[row_index])
                     new_edge = Edge({'alpha'}, {repr(self.edges[col_index])}, None, label)
@@ -1430,7 +1428,7 @@ class Metagraph(object):
                         compressed_edges.append(new_edge)
 
             elif row.__contains__(1) and (not row.__contains__(-1)):
-                col_indices = list(self.occurrences(1, row))
+                col_indices = list(occurrences(1, row))
                 for col_index in col_indices:
                     label = '<%s, %s>' % (list(self.generating_set)[row_index], repr(self.edges[col_index]))
                     new_edge = Edge({repr(self.edges[col_index])}, {'beta'}, None, label)
@@ -2358,39 +2356,39 @@ class MetagraphHelper:
 
     #     return result
 
-    # def multiply_components(self, adjacency_matrix1, adjacency_matrix2, generator_set1, i, j, size):
-    #     """ Multiplies elements of two adjacency matrices.
-    #     :param adjacency_matrix1: numpy.matrix
-    #     :param adjacency_matrix2: numpy.matrix
-    #     :param generator_set1: set
-    #     :param i: int
-    #     :param j: int
-    #     :param size: int
-    #     :return: list of Triple objects.
-    #     """
+    def multiply_components(self, adjacency_matrix1, adjacency_matrix2, generator_set1, i, j, size):
+        """ Multiplies elements of two adjacency matrices.
+        :param adjacency_matrix1: numpy.matrix
+        :param adjacency_matrix2: numpy.matrix
+        :param generator_set1: set
+        :param i: int
+        :param j: int
+        :param size: int
+        :return: list of Triple objects.
+        """
 
-    #     if adjacency_matrix1 is None:
-    #         raise MetagraphException('adjacency_matrix1', resources['value_null'])
-    #     if adjacency_matrix2 is None:
-    #         raise MetagraphException('adjacency_matrix2', resources['value_null'])
-    #     if generator_set1 is None or len(generator_set1) == 0:
-    #         raise MetagraphException('generator_set1', resources['value_null'])
+        if adjacency_matrix1 is None:
+            raise MetagraphException('adjacency_matrix1', resources['value_null'])
+        if adjacency_matrix2 is None:
+            raise MetagraphException('adjacency_matrix2', resources['value_null'])
+        if generator_set1 is None or len(generator_set1) == 0:
+            raise MetagraphException('generator_set1', resources['value_null'])
 
-    #     result = []
-    #     # computes the outermost loop (ie., k=1...K where K is the size of each input matrix)
-    #     for k in range(size):
-    #         a_ik = adjacency_matrix1[i][k]
-    #         b_kj = adjacency_matrix2[k][j]
-    #         temp = self.multiply_triple_lists(a_ik, b_kj, list(generator_set1)[i],
-    #                                           list(generator_set1)[j], list(generator_set1)[k])
+        result = []
+        # computes the outermost loop (ie., k=1...K where K is the size of each input matrix)
+        for k in range(size):
+            a_ik = adjacency_matrix1[i][k]
+            b_kj = adjacency_matrix2[k][j]
+            temp = self.multiply_triple_lists(a_ik, b_kj, list(generator_set1)[i],
+                                              list(generator_set1)[j], list(generator_set1)[k])
 
-    #         if temp is not None and len(temp)>0:
-    #             result+=temp
+            if temp is not None and len(temp) > 0:
+                result += temp
 
-    #     if len(result) == 0:
-    #         return None
+        if len(result) == 0:
+            return None
 
-    #     return list(set(result))
+        return list(set(result))
 
     def multiply_triple_lists(self, triple_list1, triple_list2, x_i, x_j, x_k):
         """ Multiplies two list of Triple objects and returns the result.

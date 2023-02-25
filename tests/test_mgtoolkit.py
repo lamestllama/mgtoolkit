@@ -12,6 +12,3 @@ from tests.unit_tests import RunTests
 
 suite = unittest.TestLoader().loadTestsFromTestCase(RunTests)
 unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-

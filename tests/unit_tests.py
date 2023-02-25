@@ -1,5 +1,6 @@
 import unittest
-from mgtoolkit.library import Metagraph, ConditionalMetagraph, Edge, MetagraphHelper, Metapath
+from mgtoolkit.library import Metagraph, ConditionalMetagraph, Edge
+# , MetagraphHelper, Metapath
 
 
 # noinspection PyAttributeOutsideInit
@@ -7,8 +8,8 @@ class RunTests(unittest.TestCase):
 
     # noinspection PyPep8Naming
     def setUp(self):
-        import numpy
-        t = numpy.version
+        # import numpy
+        # t = numpy.version
 
         self.generating_set1 = {1, 2, 3, 4, 5, 6, 7}
         self.mg1 = Metagraph(self.generating_set1)
@@ -76,10 +77,10 @@ class RunTests(unittest.TestCase):
         self.assertEqual(metapaths[0].source, {1})
         self.assertEqual(metapaths[0].target, {7})
 
-        #self.assertEqual(metapaths[0].edge_list[0].invertex, {1})
-        #self.assertEqual(metapaths[0].edge_list[0].outvertex, {2, 3})
-        #self.assertEqual(metapaths[0].edge_list[1].invertex, {3})
-        #self.assertEqual(metapaths[0].edge_list[1].outvertex, {6, 7})
+        # self.assertEqual(metapaths[0].edge_list[0].invertex, {1})
+        # self.assertEqual(metapaths[0].edge_list[0].outvertex, {2, 3})
+        # self.assertEqual(metapaths[0].edge_list[1].invertex, {3})
+        # self.assertEqual(metapaths[0].edge_list[1].outvertex, {6, 7})
 
         edge_dominant = None
         input_dominant = None
@@ -171,9 +172,10 @@ class RunTests(unittest.TestCase):
         mg1 = Metagraph(generating_set1)
         mg1.add_edges_from([Edge({1}, {2, 3}), Edge({1, 4}, {5}), Edge({3}, {7}), Edge({5, 2}, {6}),
                             Edge({6, 7}, {9}), Edge({3, 4, 8}, {9}), Edge({4, 8}, {1, 5})])
-        #a1=mg1.adjacency_matrix()
-        #a_star1= mg1.get_closure()
-        #incidence_matrix= mg1.incidence_matrix()
+
+        # a1=mg1.adjacency_matrix()
+        # a_star1= mg1.get_closure()
+        # incidence_matrix= mg1.incidence_matrix()
 
         metapaths1 = mg1.get_all_metapaths_from({1, 4}, {6})
 
@@ -205,13 +207,12 @@ class RunTests(unittest.TestCase):
         self.assertEqual(is_bridge, True)
 
     def test_conflict(self):
-        variable_set = {'u1','u2','u3','u4','u5','u6','r1','r2','r3'}
+        variable_set = {'u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'r1', 'r2', 'r3'}
         propositions_set = {'action=permit', 'action=deny'}
         cm = ConditionalMetagraph(variable_set, propositions_set)
-        cm.add_edges_from([
-                Edge({'u1','u2','u3'}, {'r1','r2'}, attributes=['action=permit']),
-                Edge({'u3','u4','u5'}, {'r2','r3'}, attributes=['action=deny']),
-                Edge({'u2','u3','u5','u6'}, {'r1','r2'}, attributes=['action=permit'])])
+        cm.add_edges_from([Edge({'u1', 'u2', 'u3'}, {'r1', 'r2'}, attributes=['action=permit']),
+                           Edge({'u3', 'u4', 'u5'}, {'r2', 'r3'}, attributes=['action=deny']),
+                           Edge({'u2', 'u3', 'u5', 'u6'}, {'r1', 'r2'}, attributes=['action=permit'])])
 
         all_metapaths = cm.get_all_metapaths()
         for metapath in all_metapaths:
@@ -222,11 +223,3 @@ class RunTests(unittest.TestCase):
                 pass
             #   print('conflict detected: %s'%repr(metapath.edge_list))
         return
-
-
-
-
-
-
-
-

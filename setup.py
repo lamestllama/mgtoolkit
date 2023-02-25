@@ -14,9 +14,9 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as test_command
 
-if sys.version_info[:3] != (3, 11):
-    print("mgtoolkit requires Python 3.11 (%d.%d detected)." %
-          sys.version_info[:2])
+if sys.version_info[0] != 3  or sys.version_info[1] < 5:
+    print("mgtoolkit requires Python  3.5, 3.6, 3.7, 3.8, 3.9, 3.10 or 3.11 (%d.%d detected)." %
+          sys.version_info[0:2])
     sys.exit(-1)
 
 
@@ -40,23 +40,20 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'Click>=6.0',
-    'configobj==4.7.0',
-    'pytest==2.7.0',
-    'numpy==1.10.2'
+
 ]
 
 # noinspection PyPep8
 setup(
     name='mgtoolkit',
     version='1.0.8',
-    description="This is a Python package for implementing metagraphss.",
+    description="This is a Python package for implementing metagraphs.",
     long_description=readme + '\n\n' + history,
     author="Eric Parsonage",
     author_email='eric@eparsonage.com',
     url='https://github.com/lamestllama/mgtoolkit',
     packages=[
-        'mgtoolkit',
+        'mgtoolkit'
     ],
     package_dir={'mgtoolkit':
                  'mgtoolkit'},
@@ -88,5 +85,3 @@ setup(
     }
 
 )
-
-

@@ -47,8 +47,9 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 
-lint: ## check style with flake8
-	flake8 mgtoolkit tests
+lint: ## check style with flake8. 
+## Ignore line > 79 and linebreaks after binary operator
+	flake8 --ignore=E501,W504,E731 ./mgtoolkit ./tests
 
 test: ## run tests quickly with the default Python
 	pytest
