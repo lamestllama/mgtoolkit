@@ -64,3 +64,4 @@ target/
 # travis setup file
 travis_pypi_setup.py
 .DS_Store
+test1.py
