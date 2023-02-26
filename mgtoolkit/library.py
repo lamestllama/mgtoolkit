@@ -87,6 +87,15 @@ class Triple(object):
                 len(self.edges) == len(other.edges) and
                 self.edges == other.edges)
 
+    def __lt__(self, other):
+        s1 = str(self.coinputs) if self.coinputs is None else str(sorted(self.coinputs))
+        s1 += str(self.cooutputs) if self.cooutputs is None else str(sorted(self.cooutputs))
+        s1 += str(self.edges)
+        s2 = str(other.coinputs) if other.coinputs is None else str(sorted(other.coinputs))
+        s2 += str(other.cooutputs) if other.cooutputs is None else str(sorted(other.cooutputs))
+        s2 += str(other.edges)
+        return s1 < s2
+
     # coinputs and coutputs are frozensets so they can be hashed
     # sets cannot be hashed and using hash(str(someset)) is not robust
     # since the order of the elements in the returned string need
@@ -483,7 +492,6 @@ class Metagraph(object):
         :param x_j: outvertex element
         :return: set
         """
-
         cooutputs = set(edge.outvertex)
         cooutputs.remove(x_j)
         return None if not cooutputs else cooutputs
@@ -650,36 +658,100 @@ class Metagraph(object):
 
         return self
 
+    # def get_closure(self):
+    #     """ Returns the closure matrix (i.e., A*) of the metagraph.
+    #     :return: numpy.matrix
+    #     """
+
+    #     adjacency_matrix = self.adjacency_matrix().tolist()
+
+    #     i = 0
+    #     size = len(self.generating_set)
+    #     a = dict()
+    #     a[i] = adjacency_matrix
+    #     a_star = adjacency_matrix
+
+    #     for i in range(size):
+    #         # print(' iteration %s --------------'%i)
+    #         a[i + 1] = MetagraphHelper().multiply_adjacency_matrices(a[i],
+    #                                                                  self.generating_set,
+    #                                                                  adjacency_matrix,
+    #                                                                  self.generating_set)
+    #         # print('multiply_adjacency_matrices complete')
+    #         a_star = MetagraphHelper().add_adjacency_matrices(a_star,
+    #                                                           self.generating_set,
+    #                                                           a[i + 1],
+    #                                                           self.generating_set)
+    #         # print('add_adjacency_matrices complete')
+    #         if a[i + 1] == a[i]:
+    #             break
+
+    #     # noinspection PyCallingNonCallable
+    #     return matrix(a_star, dtype=object)
+
     def get_closure(self):
         """ Returns the closure matrix (i.e., A*) of the metagraph.
         :return: numpy.matrix
         """
 
         adjacency_matrix = self.adjacency_matrix().tolist()
-
-        i = 0
-        size = len(self.generating_set)
-        a = dict()
-        a[i] = adjacency_matrix
+        a_prev = adjacency_matrix
         a_star = adjacency_matrix
 
-        for i in range(size):
+        for i in self.generating_set:
             # print(' iteration %s --------------'%i)
-            a[i + 1] = MetagraphHelper().multiply_adjacency_matrices(a[i],
-                                                                     self.generating_set,
-                                                                     adjacency_matrix,
-                                                                     self.generating_set)
+            a_next = MetagraphHelper().multiply_adjacency_matrices(a_prev,
+                                                                   self.generating_set,
+                                                                   adjacency_matrix,
+                                                                   self.generating_set)
             # print('multiply_adjacency_matrices complete')
             a_star = MetagraphHelper().add_adjacency_matrices(a_star,
                                                               self.generating_set,
-                                                              a[i + 1],
+                                                              a_next,
                                                               self.generating_set)
+
+            # TODO I dont think this is the right comparison. Paths of length n
+            # compared against paths of length n+1 ?
             # print('add_adjacency_matrices complete')
-            if a[i + 1] == a[i]:
+            if a_next == a_prev:
                 break
+
+            a_prev = a_next
 
         # noinspection PyCallingNonCallable
         return matrix(a_star, dtype=object)
+
+    # def get_closure100(self):
+    #     """ Returns the closure matrix (i.e., A*) of the metagraph.
+    #     :return: numpy.matrix
+    #     """
+    #     adjacency_matrix = self.adjacency_matrix().tolist()
+    #     a_star = adjacency_matrix
+    #     a_star_prev = adjacency_matrix
+
+    #     i = 1
+    #     size = len(self.generating_set)
+    #     while size > i**2:
+    #         # print(' iteration %s --------------'%i)
+    #         a_star = MetagraphHelper().multiply_adjacency_matrices(a_star_prev,
+    #                                                                self.generating_set,
+    #                                                                a_star_prev,
+    #                                                                self.generating_set)
+    #         # print('multiply_adjacency_matrices complete')
+    #         a_star = MetagraphHelper().add_adjacency_matrices(a_star,
+    #                                                           self.generating_set,
+    #                                                           adjacency_matrix,
+    #                                                           self.generating_set)
+
+    #         # print('add_adjacency_matrices complete')
+
+    #         if a_star == a_star_prev:
+    #             break
+
+    #         a_star_prev = a_star
+    #         i = i + 1
+    #     # noinspection PyCallingNonCallable
+    #     return matrix(a_star, dtype=object)
 
     def get_all_metapaths_from(self, source, target):
         """ Retrieves all metapaths between given source and target in the metagraph.
@@ -1240,6 +1312,7 @@ class Metagraph(object):
         #                         i.cooutputs.remove(elt)
         #                     if (i.cooutputs is None or len(i.cooutputs) == 0) and (i not in to_drop):
         #                         to_drop.append(i)
+
         for i in range(len(triples_list_l0)):
             for j in range(len(triples_list_l0)):
                 if i != j:
@@ -1251,7 +1324,7 @@ class Metagraph(object):
                                                     triples_list_l0[i].edges)
 
                         if (triples_list_l0[i].cooutputs is None or
-                                (len(triples_list_l0[i].cooutputs) == 0) and
+                            (not triples_list_l0[i].cooutputs) and
                                 (triples_list_l0[i] not in to_drop)):
                             to_drop.append(triples_list_l0[i])
 
@@ -2354,7 +2427,8 @@ class MetagraphHelper:
             raise MetagraphException('generator_set2', resources['value_null'])
 
         # check generating sets are identical
-        if not (len(generator_set1.difference(generator_set2)) == 0 and len(generator_set2.difference(generator_set1)) == 0):
+        if not (len(generator_set1.difference(generator_set2)) == 0 and
+                len(generator_set2.difference(generator_set1)) == 0):
             raise MetagraphException('generator_sets', resources['not_identical'])
 
         size = len(generator_set1)
@@ -2469,7 +2543,7 @@ class MetagraphHelper:
         if len(triples_list) > 0:
             return list(set(triples_list))
 
-        return []
+        return None
 
     @staticmethod
     def multiply_triples(triple1, triple2, x_i, x_j, x_k):
@@ -2510,21 +2584,39 @@ class MetagraphHelper:
             beta_r = beta_r.difference(({x_j}))
 
         # compute gamma(R)
-        truncated = []
-        if triple1.edges not in truncated:
-            if isinstance(triple1.edges, Edge):
-                truncated.append(triple1.edges)
-            else:
-                if isinstance(triple1.edges, list):
-                    truncated = copy.copy(triple1.edges)
+        # truncated = []
+        # if triple1.edges not in truncated:
+        #     if isinstance(triple1.edges, Edge):
+        #         truncated.append(triple1.edges)
+        #     else:
+        #         if isinstance(triple1.edges, list):
+        #             truncated+=triple1.edges
 
-        if triple2.edges not in truncated:
-            if isinstance(triple2.edges, Edge):
-                truncated.append(triple2.edges)
-            else:
-                truncated.append = copy.copy(triple2.edges)
+        # if triple2.edges not in truncated:
+        #     if isinstance(triple2.edges, Edge):
+        #         truncated.append(triple2.edges)
+        #     else:
+        #         truncated+=triple2.edges
+        #
+        # gamma_r = truncated
 
-        gamma_r = truncated
+        # The trnc operator in Basu and Blanning is flawed it places paths in A* at the ijth
+        # positionthat dont have the edges to go from x_ i to x_k as it lops of any once they
+        # repeat. I believe that either paths that repeat an edge should not be included rather
+        # than truncated or that the repeated section should be removed.
+        # here i remove repeated paths which makes the multiplication associative
+
+        gamma_r = []
+        gamma_r += [triple1.edges] if isinstance(triple1.edges, Edge) else triple1.edges
+
+        edges2 = []
+        edges2 += [triple2.edges] if isinstance(triple2.edges, Edge) else triple2.edges
+
+        for e in edges2:
+            if e in gamma_r:
+                return None
+
+        gamma_r += edges2
 
         return Triple(alpha_r, beta_r, gamma_r)
 
