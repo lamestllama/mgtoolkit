@@ -89,11 +89,15 @@ class Node(object):
     def __init__(self, element_set):
         if element_set is None or len(element_set) == 0:
             raise MetagraphException('element_set', resources['value_null'])
-        if not isinstance(element_set, set):
+        if not isinstance(element_set, frozenset) and not isinstance(element_set, set):
             raise MetagraphException('element_set', resources['format_invalid'])
 
-        self.element_set = element_set
-
+        if not isinstance(element_set, frozenset):
+            self.element_set = element_set
+        else:
+            self.element_set = frozenset(element_set)
+            
+        
     def get_element_set(self):
         """ Returns the node elements
         :return: set
@@ -113,23 +117,34 @@ class Edge(object):
             raise MetagraphException('invertex', resources['value_null'])
         if outvertex is None or len(outvertex) == 0:
             raise MetagraphException('outvertex', resources['value_null'])
-        if not isinstance(invertex, set):
+        if not isinstance(invertex, frozenset) and not isinstance(invertex, set):
             raise MetagraphException('invertex', resources['format_invalid'])
-        if not isinstance(outvertex, set):
+        if not isinstance(outvertex, frozenset) and not isinstance(outvertex, set):
             raise MetagraphException('outvertex', resources['format_invalid'])
+        if label is not None and not isinstance(label, str):
+             raise MetagraphException('outvertex', resources['format_invalid'])
 
-        self.invertex = invertex
-        self.outvertex = outvertex
+        if isinstance(invertex, frozenset):
+            self.invertex = invertex
+        else:
+            self.invertex = frozenset(invertex)
+
+        if isinstance(outvertex, frozenset):
+            self.outvertex = outvertex
+        else:
+            self.outvertex = frozenset(outvertex)
+
         self.attributes = attributes
         self.label = label
 
         # include attributes as part if invertex
+        # this is why we dont need the attributes as part of the hash function
         if attributes is not None:
             invertex = list(self.invertex)
             for attribute in attributes:
                 if attribute not in invertex:
                     invertex.append(attribute)
-            self.invertex = set(invertex)
+            self.invertex = frozenset(invertex)
 
     def __repr__(self):
         return 'Edge(%s, %s)' % (self.invertex, self.outvertex)
@@ -158,16 +173,18 @@ class Edge(object):
         if not isinstance(other, Edge):
             return False
 
+        # TODO should equality check for equal labels too?
         return (self.invertex == other.invertex and
                 self.outvertex == other.outvertex and
                 self.attributes == other.attributes)
 
-    # TODO need to stop using sets in this way. Perhaps frozensets?
+    # Invertex and Outvertex are frozensets so they can be hashed
+    # sets cannot be hashed and using hash(str(someset)) is not robust
+    # since the order of the elements in the returned string need 
+    # not be the same 
     def __hash__(self):
-        s = str(self.label)
-        s += str(sorted(self.invertex, key=lambda x: str(x)))
-        s += str(sorted(self.outvertex, key=lambda x: str(x)))
-        return hash(s)
+        # Python tuples use a simplified version of the xxHash algorithm to capture order
+        return hash(self.label) ^ hash((self.invertex, self.outvertex))
 
 
 class Metapath(object):
