@@ -65,3 +65,4 @@ target/
 travis_pypi_setup.py
 .DS_Store
 test1.py
+.DS_Store
