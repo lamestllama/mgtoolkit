@@ -96,8 +96,7 @@ class Node(object):
             self.element_set = element_set
         else:
             self.element_set = frozenset(element_set)
-            
-        
+
     def get_element_set(self):
         """ Returns the node elements
         :return: set
@@ -122,7 +121,7 @@ class Edge(object):
         if not isinstance(outvertex, frozenset) and not isinstance(outvertex, set):
             raise MetagraphException('outvertex', resources['format_invalid'])
         if label is not None and not isinstance(label, str):
-             raise MetagraphException('outvertex', resources['format_invalid'])
+            raise MetagraphException('outvertex', resources['format_invalid'])
 
         if isinstance(invertex, frozenset):
             self.invertex = invertex
@@ -180,8 +179,8 @@ class Edge(object):
 
     # Invertex and Outvertex are frozensets so they can be hashed
     # sets cannot be hashed and using hash(str(someset)) is not robust
-    # since the order of the elements in the returned string need 
-    # not be the same 
+    # since the order of the elements in the returned string need
+    # not be the same
     def __hash__(self):
         # Python tuples use a simplified version of the xxHash algorithm to capture order
         return hash(self.label) ^ hash((self.invertex, self.outvertex))
