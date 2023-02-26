@@ -28,8 +28,21 @@ class Triple(object):
         if edges is None:
             raise MetagraphException('edges', resources['value_null'])
 
-        self.coinputs = coinputs
-        self.cooutputs = cooutputs
+        if not (isinstance(coinputs, frozenset) or isinstance(coinputs, set) or coinputs is None):
+            raise MetagraphException('coinputs', resources['format_invalid'])
+        if not (isinstance(cooutputs, frozenset) or isinstance(cooutputs, set) or cooutputs is None):
+            raise MetagraphException('cooutputs', resources['format_invalid'])
+
+        if isinstance(coinputs, frozenset) or coinputs is None:
+            self.coinputs = coinputs
+        else:
+            self.coinputs = frozenset(coinputs)
+
+        if isinstance(cooutputs, frozenset) or cooutputs is None:
+            self.cooutputs = cooutputs
+        else:
+            self.cooutputs = frozenset(cooutputs)
+
         self.edges = edges
 
     def coinputs(self):
@@ -74,12 +87,13 @@ class Triple(object):
                 len(self.edges) == len(other.edges) and
                 self.edges == other.edges)
 
-# TODO need to stop using sets in this way.
+    # coinputs and coutputs are frozensets so they can be hashed
+    # sets cannot be hashed and using hash(str(someset)) is not robust
+    # since the order of the elements in the returned string need
+    # not be the same
     def __hash__(self):
-        s = str(None) if self.coinputs is None else str(sorted(self.coinputs, key=lambda x: str(x)))
-        s += str(None) if self.cooutputs is None else str(sorted(self.cooutputs, key=lambda x: str(x)))
-        s += str(self.edges)
-        return hash(s)
+        # Python tuples use a simplified version of the xxHash algorithm to capture order
+        return hash((self.coinputs, self.coinputs)) ^ hash(tuple(self.edges))
 
 
 class Node(object):
@@ -449,15 +463,18 @@ class Metagraph(object):
         :param x_i: invertex element
         :return: set
         """
+        coinputs = set(edge.invertex)
+        coinputs.remove(x_i)
+        return None if not coinputs else coinputs
 
-        coinputs = None
-        all_inputs = edge.invertex
-        if x_i in list(all_inputs):
-            coinputs = list(all_inputs)
-            coinputs.remove(x_i)
-        if coinputs is not None and len(coinputs) > 0:
-            return set(coinputs)
-        return None
+        # coinputs = None
+        # all_inputs = edge.invertex
+        # if x_i in list(all_inputs):
+        #     coinputs = list(all_inputs)
+        #     coinputs.remove(x_i)
+        # if coinputs is not None and len(coinputs) > 0:
+        #     return set(coinputs)
+        # return None
 
     @staticmethod
     def get_cooutputs(edge, x_j):
@@ -467,14 +484,18 @@ class Metagraph(object):
         :return: set
         """
 
-        cooutputs = None
-        all_outputs = edge.outvertex
-        if x_j in list(all_outputs):
-            cooutputs = list(all_outputs)
-            cooutputs.remove(x_j)
-        if cooutputs is not None and len(cooutputs) > 0:
-            return set(cooutputs)
-        return None
+        cooutputs = set(edge.outvertex)
+        cooutputs.remove(x_j)
+        return None if not cooutputs else cooutputs
+
+        # cooutputs = None
+        # all_outputs = edge.outvertex
+        # if x_j in list(all_outputs):
+        #     cooutputs = list(all_outputs)
+        #     cooutputs.remove(x_j)
+        # if cooutputs is not None and len(cooutputs) > 0:
+        #     return set(cooutputs)
+        # return None
 
     def adjacency_matrix_old(self):
         """ Returns the adjacency matrix of the metagraph.
@@ -1192,33 +1213,47 @@ class Metagraph(object):
 
         to_drop = []
 
-        for i in triples_list_l0:
-            for j in triples_list_l0:
+        # for i in triples_list_l0:
+        #     for j in triples_list_l0:
+        #         if i != j:
+        #             inputs_i = i.coinputs
+        #             inputs_j = j.coinputs
+        #             outputs_i = i.cooutputs
+        #             outputs_j = j.cooutputs
+
+        #             # check if input and output of j are a subset of i
+        #             input_subset = True
+        #             for input_elt in inputs_j:
+        #                 if input_elt not in inputs_i:
+        #                     input_subset = False
+        #                     break
+
+        #             if input_subset:
+        #                 output_subset = True
+        #                 for output in outputs_j:
+        #                     if output not in outputs_i:
+        #                         output_subset = False
+        #                         break
+
+        #                 if output_subset:
+        #                     for elt in j.cooutputs:
+        #                         i.cooutputs.remove(elt)
+        #                     if (i.cooutputs is None or len(i.cooutputs) == 0) and (i not in to_drop):
+        #                         to_drop.append(i)
+        for i in range(len(triples_list_l0)):
+            for j in range(len(triples_list_l0)):
                 if i != j:
-                    inputs_i = i.coinputs
-                    inputs_j = j.coinputs
-                    outputs_i = i.cooutputs
-                    outputs_j = j.cooutputs
 
-                    # check if input and output of j are a subset of i
-                    input_subset = True
-                    for input_elt in inputs_j:
-                        if input_elt not in inputs_i:
-                            input_subset = False
-                            break
+                    if (triples_list_l0[j].coinputs.issubset(triples_list_l0[i].coinputs) and
+                            triples_list_l0[j].cooutputs.issubset(triples_list_l0[i].cooutputs)):
+                        triples_list_l0[i] = Triple(triples_list_l0[i].coinputs,
+                                                    triples_list_l0[i].cooutputs - triples_list_l0[j].cooutputs,
+                                                    triples_list_l0[i].edges)
 
-                    if input_subset:
-                        output_subset = True
-                        for output in outputs_j:
-                            if output not in outputs_i:
-                                output_subset = False
-                                break
-
-                        if output_subset:
-                            for elt in j.cooutputs:
-                                i.cooutputs.remove(elt)
-                            if (i.cooutputs is None or len(i.cooutputs) == 0) and (i not in to_drop):
-                                to_drop.append(i)
+                        if (triples_list_l0[i].cooutputs is None or
+                                (len(triples_list_l0[i].cooutputs) == 0) and
+                                (triples_list_l0[i] not in to_drop)):
+                            to_drop.append(triples_list_l0[i])
 
         for item in to_drop:
             triples_list_l0.remove(item)
