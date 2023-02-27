@@ -37,8 +37,8 @@ class RunTests(unittest.TestCase):
         self.assertEqual(len(col1.tolist()), 7)
         self.assertEqual(row1.tolist()[0][1][0].coinputs, None)
         self.assertEqual(row1.tolist()[0][1][0].cooutputs, {3})
-        self.assertEqual(row1.tolist()[0][1][0].edges.invertex, {1})
-        self.assertEqual(row1.tolist()[0][1][0].edges.outvertex, {2, 3})
+        self.assertEqual(row1.tolist()[0][1][0].edges[0].invertex, {1})
+        self.assertEqual(row1.tolist()[0][1][0].edges[0].outvertex, {2, 3})
 
     def test_mg_incidence_matrix(self):
         incidence_m = self.mg1.incidence_matrix()
@@ -65,8 +65,8 @@ class RunTests(unittest.TestCase):
         self.assertEqual(row1.tolist()[0][3], None)
         self.assertEqual(row1.tolist()[0][4][0].coinputs, {4})
         self.assertEqual(row1.tolist()[0][4][0].cooutputs, None)
-        self.assertEqual(row1.tolist()[0][4][0].edges.invertex, {1, 4})
-        self.assertEqual(row1.tolist()[0][4][0].edges.outvertex, {5})
+        self.assertEqual(row1.tolist()[0][4][0].edges[0].invertex, {1, 4})
+        self.assertEqual(row1.tolist()[0][4][0].edges[0].outvertex, {5})
 
     def test_mg_metapaths(self):
         source = {1}
