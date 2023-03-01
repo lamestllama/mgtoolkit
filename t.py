@@ -3,6 +3,7 @@ class Triple(object):
     """ Captures a set of co-inputs, co-outputs and edges between two metagraph elements.
     """
 
+
     def __init__(self, coinputs, cooutputs, edges):
         if edges is None:
             raise MetagraphException('edges', resources['value_null'])
