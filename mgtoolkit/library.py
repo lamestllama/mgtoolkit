@@ -508,36 +508,36 @@ class Metagraph(object):
         #     return set(cooutputs)
         # return None
 
-    def adjacency_matrix_old(self):
-        """ Returns the adjacency matrix of the metagraph.
-        :return: numpy.matrix
-        """
+    # def adjacency_matrix_old(self):
+    #     """ Returns the adjacency matrix of the metagraph.
+    #     :return: numpy.matrix
+    #     """
 
-        # get matrix size
-        size = len(self.generating_set)
-        adj_matrix = MetagraphHelper().get_null_matrix(size, size)
+    #     # get matrix size
+    #     size = len(self.generating_set)
+    #     adj_matrix = MetagraphHelper().get_null_matrix(size, size)
 
-        # one triple for each edge e connecting x_i to x_j
-        for i in range(size):
-            for j in range(size):
-                x_i = list(self.generating_set)[i]
-                x_j = list(self.generating_set)[j]
-                # multiple edges may exist between x_i and x_j
-                edges = self.get_edges({x_i}, {x_j})
-                if len(edges) > 0:
-                    triples_list = []
-                    for edge in edges:
-                        coinputs = self.get_coinputs(edge, x_i)
-                        cooutputs = self.get_cooutputs(edge, x_j)
-                        triple = Triple(coinputs, cooutputs, edge)
-                        if triple not in triples_list:
-                            triples_list.append(triple)
+    #     # one triple for each edge e connecting x_i to x_j
+    #     for i in range(size):
+    #         for j in range(size):
+    #             x_i = list(self.generating_set)[i]
+    #             x_j = list(self.generating_set)[j]
+    #             # multiple edges may exist between x_i and x_j
+    #             edges = self.get_edges({x_i}, {x_j})
+    #             if len(edges) > 0:
+    #                 triples_list = []
+    #                 for edge in edges:
+    #                     coinputs = self.get_coinputs(edge, x_i)
+    #                     cooutputs = self.get_cooutputs(edge, x_j)
+    #                     triple = Triple(coinputs, cooutputs, edge)
+    #                     if triple not in triples_list:
+    #                         triples_list.append(triple)
 
-                    adj_matrix[i][j] = triples_list
+    #                 adj_matrix[i][j] = triples_list
 
-        # return adj_matrix
-        # noinspection PyCallingNonCallable
-        return matrix(adj_matrix, dtype=object)
+    #     # return adj_matrix
+    #     # noinspection PyCallingNonCallable
+    #     return matrix(adj_matrix, dtype=object)
 
     def adjacency_matrix(self):
         """ Returns the adjacency matrix of the metagraph.
@@ -2377,6 +2377,12 @@ class MetagraphHelper:
                         temp = list()
                         temp = (adjacency_matrix1[i][j] + adjacency_matrix2[i][j])
                         combined_adjacency_matrix[i][j] = list(set(temp))
+
+                        # for triple in adjacency_matrix2[i][j]:
+                        #     if triple not in adjacency_matrix1[i][j]:
+                        #         temp.append(triple)
+
+                        # combined_adjacency_matrix[i][j] = temp
 
         else:
             # generating sets overlap but are different...need to redefine adjacency matrices before adding them
