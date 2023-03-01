@@ -701,6 +701,9 @@ class Metagraph(object):
         a_prev = adjacency_matrix
         a_star = adjacency_matrix
 
+        size = len(self.generating_set)
+        empty = MetagraphHelper().get_null_matrix(size, size)
+
         for i in self.generating_set:
             # print(' iteration %s --------------'%i)
             a_next = MetagraphHelper().multiply_adjacency_matrices(a_prev,
@@ -713,10 +716,8 @@ class Metagraph(object):
                                                               a_next,
                                                               self.generating_set)
 
-            # TODO I dont think this is the right comparison. Paths of length n
-            # compared against paths of length n+1 ?
             # print('add_adjacency_matrices complete')
-            if a_next == a_prev:
+            if a_next == empty:
                 break
 
             a_prev = a_next
@@ -724,79 +725,79 @@ class Metagraph(object):
         # noinspection PyCallingNonCallable
         return matrix(a_star, dtype=object)
 
-    def get_closure100(self):
-        """ Returns the closure matrix (i.e., A*) of the metagraph.
-        :return: numpy.matrix
-        """
-        adjacency_matrix = self.adjacency_matrix().tolist()
-        a_star = adjacency_matrix
-        a_star_prev = adjacency_matrix
+    # def get_closure100(self):
+    #     """ Returns the closure matrix (i.e., A*) of the metagraph.
+    #     :return: numpy.matrix
+    #     """
+    #     adjacency_matrix = self.adjacency_matrix().tolist()
+    #     a_star = adjacency_matrix
+    #     a_star_prev = adjacency_matrix
 
-        i = 1
-        size = len(self.generating_set)
-        while size > i**2:
-            # print(' iteration %s --------------'%i)
-            a_star = MetagraphHelper().multiply_adjacency_matrices(a_star_prev,
-                                                                   self.generating_set,
-                                                                   a_star_prev,
-                                                                   self.generating_set)
-            # print('multiply_adjacency_matrices complete')
-            a_star = MetagraphHelper().add_adjacency_matrices(a_star,
-                                                              self.generating_set,
-                                                              adjacency_matrix,
-                                                              self.generating_set)
+    #     i = 1
+    #     size = len(self.generating_set)
+    #     while size > i**2:
+    #         # print(' iteration %s --------------'%i)
+    #         a_star = MetagraphHelper().multiply_adjacency_matrices(a_star_prev,
+    #                                                                self.generating_set,
+    #                                                                a_star_prev,
+    #                                                                self.generating_set)
+    #         # print('multiply_adjacency_matrices complete')
+    #         a_star = MetagraphHelper().add_adjacency_matrices(a_star,
+    #                                                           self.generating_set,
+    #                                                           adjacency_matrix,
+    #                                                           self.generating_set)
 
-            # print('add_adjacency_matrices complete')
+    #         # print('add_adjacency_matrices complete')
 
-            if a_star == a_star_prev:
-                break
+    #         if a_star == a_star_prev:
+    #             break
 
-            a_star_prev = a_star
-            i = i + 1
-        # noinspection PyCallingNonCallable
-        return matrix(a_star, dtype=object)
+    #         a_star_prev = a_star
+    #         i = i + 1
+    #     # noinspection PyCallingNonCallable
+    #     return matrix(a_star, dtype=object)
 
-    def get_closure200(self):
-        """ Returns the closure matrix (i.e., A*) of the metagraph.
-        :return: numpy.matrix
-        """
-        adjacency_matrix = self.adjacency_matrix().tolist()
-        a_star = adjacency_matrix
-        a_star_prev = adjacency_matrix
+    # def get_closure200(self):
+    #     """ Returns the closure matrix (i.e., A*) of the metagraph.
+    #     :return: numpy.matrix
+    #     """
+    #     adjacency_matrix = self.adjacency_matrix().tolist()
+    #     a_star = adjacency_matrix
+    #     a_star_prev = adjacency_matrix
 
-        a_a2_prev = MetagraphHelper().multiply_adjacency_matrices(adjacency_matrix,
-                                                                  self.generating_set,
-                                                                  adjacency_matrix,
-                                                                  self.generating_set)
+    #     a_a2_prev = MetagraphHelper().multiply_adjacency_matrices(adjacency_matrix,
+    #                                                               self.generating_set,
+    #                                                               adjacency_matrix,
+    #                                                               self.generating_set)
 
-        a_a2_prev = MetagraphHelper().add_adjacency_matrices(a_a2_prev,
-                                                             self.generating_set,
-                                                             adjacency_matrix,
-                                                             self.generating_set)
+    #     a_a2_prev = MetagraphHelper().add_adjacency_matrices(a_a2_prev,
+    #                                                          self.generating_set,
+    #                                                          adjacency_matrix,
+    #                                                          self.generating_set)
 
-        i = 0
-        size = len(self.generating_set)
-        while size > (i + 1)**2:
-            # print(' iteration %s --------------'%i)
-            a_a2_next = MetagraphHelper().multiply_adjacency_matrices(a_a2_prev,
-                                                                      self.generating_set,
-                                                                      a_a2_prev,
-                                                                      self.generating_set)
-            # print('multiply_adjacency_matrices complete')
-            a_star = MetagraphHelper().add_adjacency_matrices(a_a2_prev,
-                                                              self.generating_set,
-                                                              a_a2_next,
-                                                              self.generating_set)
+    #     i = 0
+    #     size = len(self.generating_set)
+    #     while size > (i + 1)**2:
+    #         # print(' iteration %s --------------'%i)
+    #         a_a2_next = MetagraphHelper().multiply_adjacency_matrices(a_a2_prev,
+    #                                                                   self.generating_set,
+    #                                                                   a_a2_prev,
+    #                                                                   self.generating_set)
+    #         # print('multiply_adjacency_matrices complete')
+    #         a_star = MetagraphHelper().add_adjacency_matrices(a_a2_prev,
+    #                                                           self.generating_set,
+    #                                                           a_a2_next,
+    #                                                           self.generating_set)
 
-            # print('add_adjacency_matrices complete')
+    #         # print('add_adjacency_matrices complete')
 
-            if a_star == a_star_prev:
-                break
+    #         if a_star == a_star_prev:
+    #             break
 
-            a_star_prev = a_star
-            i = i + 1
-        # noinspection PyCallingNonCallable
-        return matrix(a_star, dtype=object)
+    #         a_star_prev = a_star
+    #         i = i + 1
+    #     # noinspection PyCallingNonCallable
+    #     return matrix(a_star, dtype=object)
 
     def get_all_metapaths_from(self, source, target):
         """ Retrieves all metapaths between given source and target in the metagraph.
