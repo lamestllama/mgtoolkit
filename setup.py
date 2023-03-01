@@ -46,7 +46,7 @@ requirements = [
 # noinspection PyPep8
 setup(
     name='mgtoolkit',
-    version='1.1.1',
+    version='1.1.2',
     description="This is a Python package for implementing metagraphs.",
     long_description=readme + '\n\n' + history,
     author="Eric Parsonage",
